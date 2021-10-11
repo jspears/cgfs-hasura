@@ -1,0 +1,14 @@
+{
+  "name": "cgfs-hasura",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:jspears/cgfs-hasura.git",
+  "author": "Justin <juspears@paypal.com>",
+  "license": "MIT",
+  "dependencies": {
+    "hasura": "^2.0.1"
+  },
+  "devDependencies": {
+    "hasura-cli": "^2.0.9"
+  }
+}

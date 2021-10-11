@@ -1,0 +1,295 @@
+- table:
+    schema: public
+    name: address
+  configuration:
+    custom_root_fields: {}
+    custom_column_names:
+      created_by: createdBy
+      updated_at: updatedAt
+      created_at: createdAt
+- table:
+    schema: public
+    name: game
+  configuration:
+    custom_root_fields: {}
+    custom_column_names:
+      home_team_id: homeTeamId
+      visitor_team_runs: visitorTeamRuns
+      address_id: addressId
+      visitor_team_id: visitorTeamId
+      updated_at: updatedAt
+      home_team_runs: homeTeamRuns
+  object_relationships:
+  - name: address
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: address
+        insertion_order: null
+        column_mapping:
+          address_id: id
+  - name: createdBy
+    using:
+      foreign_key_constraint_on: created_by
+  - name: home
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: team
+        insertion_order: null
+        column_mapping:
+          home_team_id: id
+  - name: visitor
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: team
+        insertion_order: null
+        column_mapping:
+          visitor_team_id: id
+- table:
+    schema: public
+    name: league
+  configuration:
+    custom_root_fields: {}
+    custom_column_names:
+      updated_at: updatedAt
+  object_relationships:
+  - name: address
+    using:
+      foreign_key_constraint_on: address_id
+  - name: league_creeated_by
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: user
+        insertion_order: null
+        column_mapping:
+          created_by: id
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - id
+      - name
+      - created_by
+      - created_at
+      filter: {}
+- table:
+    schema: public
+    name: player
+  configuration:
+    custom_root_fields: {}
+    custom_column_names:
+      updated_at: updatedAt
+  object_relationships:
+  - name: address
+    using:
+      foreign_key_constraint_on: address_id
+  - name: createdBy
+    using:
+      foreign_key_constraint_on: created_by
+  array_relationships:
+  - name: teams
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: team_player_role
+        insertion_order: null
+        column_mapping:
+          id: player_id
+- table:
+    schema: public
+    name: player_role
+  is_enum: true
+  configuration:
+    custom_root_fields: {}
+    custom_name: PlayerRole
+    custom_column_names: {}
+  array_relationships:
+  - name: team_player_roles
+    using:
+      foreign_key_constraint_on:
+        column: role_id
+        table:
+          schema: public
+          name: team_player_role
+- table:
+    schema: public
+    name: role
+  object_relationships:
+  - name: createdBy
+    using:
+      foreign_key_constraint_on: created_by
+- table:
+    schema: public
+    name: team
+  configuration:
+    custom_root_fields: {}
+    custom_column_names:
+      league_id: leagueId
+      created_by: createdBy
+      updated_at: updatedAt
+      created_at: createdAt
+  object_relationships:
+  - name: league
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: league
+        insertion_order: null
+        column_mapping:
+          league_id: id
+  array_relationships:
+  - name: roster
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: team_player_role
+        insertion_order: null
+        column_mapping:
+          id: team_id
+  insert_permissions:
+  - role: user
+    permission:
+      check:
+        created_by:
+          _eq: X-Hasura-User-Id
+      columns: []
+      backend_only: false
+  select_permissions:
+  - role: user
+    permission:
+      columns: []
+      filter: {}
+  update_permissions:
+  - role: user
+    permission:
+      columns: []
+      filter:
+        created_by:
+          _eq: X-Hasura-User-Id
+      check: {}
+  delete_permissions:
+  - role: user
+    permission:
+      filter:
+        created_by:
+          _eq: X-Hasura-User-Id
+- table:
+    schema: public
+    name: team_player_role
+  configuration:
+    custom_root_fields:
+      select: teamPlayerRoles
+    custom_column_names:
+      team_id: teamId
+      role_id: roleId
+      player_id: playerId
+      created_at: createdAt
+  object_relationships:
+  - name: createdBy
+    using:
+      foreign_key_constraint_on: created_by
+  - name: player
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: player
+        insertion_order: null
+        column_mapping:
+          player_id: id
+  - name: role
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: player_role
+        insertion_order: null
+        column_mapping:
+          role_id: role
+  - name: team
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: team
+        insertion_order: null
+        column_mapping:
+          team_id: id
+- table:
+    schema: public
+    name: user
+  configuration:
+    custom_root_fields: {}
+    custom_column_names:
+      updated_at: updatedAt
+  array_relationships:
+  - name: roles
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: user_role
+        insertion_order: null
+        column_mapping:
+          id: user_id
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - auth0
+      - created_at
+      - id
+      - last_seen
+      - name
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
+      limit: 1
+- table:
+    schema: public
+    name: user_role
+  configuration:
+    custom_root_fields: {}
+    custom_column_names:
+      role_id: roleId
+      updated_at: updatedAt
+      created_at: createdAt
+      user_id: userId
+  object_relationships:
+  - name: createdBy
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: user
+        insertion_order: null
+        column_mapping:
+          created_by: id
+  - name: role
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: role
+        insertion_order: null
+        column_mapping:
+          role_id: id
+  - name: user
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: user
+        insertion_order: null
+        column_mapping:
+          user_id: id
